@@ -68,11 +68,7 @@ make help
 
 To send a test message to Kafka from Laravel:
 
-```bash
-make seed-message
-```
-
-You can also use the simple UI at [http://localhost:8000](http://localhost:8000) to send messages and see them broadcast in real-time.
+You can use the simple UI at [http://localhost:8000](http://localhost:8000) to send messages and see them broadcast in real-time.
 
 ---
 
