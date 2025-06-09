@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  # Zookeeper necesario para Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  # Kafka broker
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - kafka
+
+  # Laravel producer
+  laravel-app:
+    build:
+      context: ./laravel
+    volumes:
+      - ./laravel/app/Services/:/var/www/html/app/Services/
+      - ./laravel/resources/views/:/var/www/html/resources/views/
+      - ./laravel/routes/web.php:/var/www/html/routes/web.php
+    working_dir: /var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+
+  # Node.js consumer
+  node-consumer:
+    build:
+      context: ./node-consumer
+    volumes:
+      - ./node-consumer/index.js:/app/index.js
+    working_dir: /app
+    ports:
+      - "3001:3001"
+    depends_on:
+      - kafka
