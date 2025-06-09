@@ -1,4 +1,4 @@
-# Kafka + Laravel + Node.js Demo
+# Kafka + Laravel + Node.js + Websockets Demo
 
 This project demonstrates a basic event-driven architecture using **Laravel** (PHP) to send messages to **Kafka**, and a **Node.js** consumer that receives those messages and broadcasts them over **WebSockets** to the browser in real-time.
 
